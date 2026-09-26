@@ -1,0 +1,310 @@
+<Application x:Class="AutomatedMacro.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:AutomatedMacro"
+             ThemeMode="Dark"
+             ShutdownMode="OnMainWindowClose">
+    <Application.Resources>
+        <ResourceDictionary>
+            <FontFamily x:Key="IconFont">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
+
+            <!-- ===== Paleta (tamna, ljubicasti naglasak) ===== -->
+            <Color x:Key="AccentColor">#7C5CFF</Color>
+            <SolidColorBrush x:Key="WindowBgBrush" Color="#131317"/>
+            <SolidColorBrush x:Key="PanelBgBrush" Color="#17171C"/>
+            <SolidColorBrush x:Key="SurfaceBrush" Color="#1E1E25"/>
+            <SolidColorBrush x:Key="SurfaceHoverBrush" Color="#272730"/>
+            <SolidColorBrush x:Key="SurfacePressedBrush" Color="#2F2F3A"/>
+            <SolidColorBrush x:Key="BorderBrush" Color="#2A2A33"/>
+            <SolidColorBrush x:Key="BorderStrongBrush" Color="#3A3A46"/>
+            <SolidColorBrush x:Key="TextBrush" Color="#ECECF1"/>
+            <SolidColorBrush x:Key="DimTextBrush" Color="#A0A0AB"/>
+            <SolidColorBrush x:Key="FaintTextBrush" Color="#6B6B76"/>
+            <SolidColorBrush x:Key="AccentBrush" Color="#7C5CFF"/>
+            <SolidColorBrush x:Key="AccentLightBrush" Color="#A78BFA"/>
+            <SolidColorBrush x:Key="HeaderBrush" Color="#9D8CFF"/>
+            <SolidColorBrush x:Key="AccentSoftBrush" Color="#337C5CFF"/>
+            <SolidColorBrush x:Key="SelectionBrush" Color="#2B2645"/>
+            <SolidColorBrush x:Key="GroupRowBrush" Color="#0AFFFFFF"/>
+            <SolidColorBrush x:Key="HoverRowBrush" Color="#10FFFFFF"/>
+            <SolidColorBrush x:Key="SuccessBrush" Color="#3DD68C"/>
+            <SolidColorBrush x:Key="SuccessSoftBrush" Color="#1F3DD68C"/>
+            <SolidColorBrush x:Key="RecordBrush" Color="#E5484D"/>
+            <SolidColorBrush x:Key="WarningBrush" Color="#F5A524"/>
+
+            <!-- Ostatak Fluent naglaska prebojava ThemeAccent.Apply; ovdje samo bijeli tekst/kvacica na ljubicastoj. -->
+            <SolidColorBrush x:Key="TextOnAccentFillColorPrimaryBrush" Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="TextOnAccentFillColorSecondaryBrush" Color="#CCFFFFFF"/>
+            <SolidColorBrush x:Key="AccentButtonForeground" Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="AccentButtonForegroundPointerOver" Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="AccentButtonForegroundPressed" Color="#CCFFFFFF"/>
+
+            <local:HexToBrushConverter x:Key="HexToBrush"/>
+            <local:BoolToVisibilityConverter x:Key="BoolToVis"/>
+            <local:BoolToVisibilityConverter x:Key="InvBoolToVis" Invert="True"/>
+            <local:NullToVisibilityConverter x:Key="NullToVis"/>
+            <local:NullToVisibilityConverter x:Key="InvNullToVis" Invert="True"/>
+            <local:TextToVisibilityConverter x:Key="TextToVis"/>
+            <local:TextToVisibilityConverter x:Key="InvTextToVis" Invert="True"/>
+            <local:EnumToVisibilityConverter x:Key="EnumToVis"/>
+            <local:DoubleClickConverter x:Key="DoubleClick"/>
+            <local:DepthToMarginConverter x:Key="DepthToMargin"/>
+
+            <!-- ===== Tekst ===== -->
+            <Style x:Key="Glyph" TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="{StaticResource IconFont}"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+
+            <Style x:Key="SectionHeader" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="Foreground" Value="{StaticResource HeaderBrush}"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+
+            <Style x:Key="FormLabel" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
+                <Setter Property="Margin" Value="0,0,10,0"/>
+            </Style>
+
+            <Style x:Key="FieldLabel" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="Foreground" Value="{StaticResource DimTextBrush}"/>
+                <Setter Property="Margin" Value="0,12,0,5"/>
+            </Style>
+
+            <Style x:Key="Hint" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="Foreground" Value="{StaticResource FaintTextBrush}"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
+            </Style>
+
+            <Style x:Key="ColumnHeader" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="Foreground" Value="{StaticResource DimTextBrush}"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+
+            <!-- ===== Gumbi ===== -->
+            <!-- Veliki gumbi Snimi / Zaustavi / Pokreni -->
+            <Style x:Key="BigToolButton" TargetType="Button">
+                <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+                <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource BorderStrongBrush}"/>
+                <Setter Property="Padding" Value="16,9,22,9"/>
+                <Setter Property="MinWidth" Value="138"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="Bd" CornerRadius="8" BorderThickness="1" Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="{StaticResource SurfaceHoverBrush}"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="{StaticResource SurfacePressedBrush}"/>
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.45"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Ikona iznad natpisa (Nova, Otvori, Spremi...) -->
+            <Style x:Key="IconLabelButton" TargetType="Button">
+                <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Padding" Value="12,6"/>
+                <Setter Property="MinWidth" Value="64"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="Bd" CornerRadius="8" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="{StaticResource SurfaceHoverBrush}"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="{StaticResource SurfacePressedBrush}"/>
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.4"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Mali gumb s ikonom (traka za uredjivanje) -->
+            <Style x:Key="FlatIconButton" TargetType="Button" BasedOn="{StaticResource IconLabelButton}">
+                <Setter Property="Padding" Value="8,6"/>
+                <Setter Property="MinWidth" Value="0"/>
+                <Setter Property="Foreground" Value="{StaticResource DimTextBrush}"/>
+            </Style>
+
+            <!-- Obrubljeni ljubicasti gumb (+ Nova procedura) -->
+            <Style x:Key="OutlineAccentButton" TargetType="Button">
+                <Setter Property="Foreground" Value="{StaticResource AccentLightBrush}"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                <Setter Property="Padding" Value="12,9"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="Bd" CornerRadius="8" BorderThickness="1" Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="{StaticResource AccentSoftBrush}"/>
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.45"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Ispunjeni ljubicasti gumb (primarna radnja) -->
+            <Style x:Key="AccentButton" TargetType="Button" BasedOn="{StaticResource OutlineAccentButton}">
+                <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="Bd" CornerRadius="8" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="#8F74FF"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="#6A4DE6"/>
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.45"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="SwatchButton" TargetType="Button">
+                <Setter Property="Width" Value="28"/>
+                <Setter Property="Height" Value="28"/>
+                <Setter Property="Margin" Value="0,0,6,6"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="Ring" CornerRadius="7" BorderThickness="2" BorderBrush="Transparent" Padding="2">
+                                <Border CornerRadius="5" Background="{TemplateBinding Background}"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Ring" Property="BorderBrush" Value="#99FFFFFF"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Strelica za sirenje/sakupljanje grupe -->
+            <Style x:Key="ChevronToggle" TargetType="ToggleButton">
+                <Setter Property="Width" Value="22"/>
+                <Setter Property="Height" Value="22"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Focusable" Value="False"/>
+                <Setter Property="Foreground" Value="{StaticResource DimTextBrush}"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ToggleButton">
+                            <Border Background="Transparent">
+                                <TextBlock x:Name="Arrow" FontFamily="{StaticResource IconFont}" Text="&#xE76C;" FontSize="10"
+                                           Foreground="{TemplateBinding Foreground}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                           RenderTransformOrigin="0.5,0.5">
+                                    <TextBlock.RenderTransform>
+                                        <RotateTransform x:Name="Rot" Angle="0"/>
+                                    </TextBlock.RenderTransform>
+                                </TextBlock>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter TargetName="Arrow" Property="RenderTransform">
+                                        <Setter.Value><RotateTransform Angle="90"/></Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Arrow" Property="Foreground" Value="{StaticResource TextBrush}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Redak u tablici koraka -->
+            <Style x:Key="StepRow" TargetType="ListBoxItem">
+                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ListBoxItem">
+                            <Border x:Name="Bd" Background="Transparent" BorderThickness="1" BorderBrush="Transparent"
+                                    CornerRadius="6" Margin="8,1,8,1" SnapsToDevicePixels="True">
+                                <ContentPresenter/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <DataTrigger Binding="{Binding IsGroup}" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="{StaticResource GroupRowBrush}"/>
+                                </DataTrigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="{StaticResource HoverRowBrush}"/>
+                                </Trigger>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="{StaticResource SelectionBrush}"/>
+                                    <Setter TargetName="Bd" Property="BorderBrush" Value="#557C5CFF"/>
+                                </Trigger>
+                                <DataTrigger Binding="{Binding IsActive}" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="{StaticResource SuccessSoftBrush}"/>
+                                    <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource SuccessBrush}"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Enabled}" Value="False">
+                                    <Setter Property="Opacity" Value="0.4"/>
+                                </DataTrigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

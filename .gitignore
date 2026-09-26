@@ -1,0 +1,12 @@
+bin/
+obj/
+*.user
+.vs/
+
+# Izlaz builda (exe ide u GitHub Releases, ne u repozitorij)
+/AutomatedMacro.exe
+/dist/
+
+# Osobni podaci programa (nastaju pokraj exe datoteke)
+/Makroi/
+/settings.json
