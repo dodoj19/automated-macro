@@ -10,6 +10,8 @@ public sealed class MacroRunner
     private readonly List<Item> _items = new();
     private readonly int _stepCount;
     private readonly int _cycles, _cycleDelayMs, _startDelaySec;
+    private readonly bool _gameClicks;
+    private readonly int _gameClickMs;
 
     /// <summary>Pozivaju se s pozadinske dretve.</summary>
     public event Action<RunProgress>? Progress;
@@ -24,6 +26,8 @@ public sealed class MacroRunner
         _cycles = singlePass ? 1 : settings.EffectiveCycles;
         _cycleDelayMs = settings.CycleDelayMs;
         _startDelaySec = singlePass ? 0 : settings.StartDelaySec;
+        _gameClicks = settings.GameClicks;
+        _gameClickMs = settings.GameClickMs;
     }
 
     public int StepCount => _stepCount;
@@ -95,9 +99,7 @@ public sealed class MacroRunner
         switch (step)
         {
             case ClickStep c:
-                InputSender.MoveTo(c.X, c.Y);
-                Thread.Sleep(30);
-                InputSender.Click(c.Button, c.Clicks);
+                ClickAt(c.X, c.Y, c.Button, c.Clicks);
                 break;
 
             case DragStep d:
@@ -107,9 +109,7 @@ public sealed class MacroRunner
             case TextStep t:
                 if (t.ClickFirst)
                 {
-                    InputSender.MoveTo(t.X, t.Y);
-                    Thread.Sleep(30);
-                    InputSender.Click(MouseButtonKind.Left, 1);
+                    ClickAt(t.X, t.Y, MouseButtonKind.Left, 1);
                     Wait(120, ct);
                 }
                 if (t.ClearFirst)
@@ -147,10 +147,33 @@ public sealed class MacroRunner
         }
     }
 
-    private static void Drag(DragStep d, CancellationToken ct)
+    /// <summary>Obican klik ili klik za igre (vidi InputSender.GameClick).</summary>
+    private void ClickAt(int x, int y, MouseButtonKind button, int clicks)
     {
-        InputSender.MoveTo(d.X, d.Y);
-        Thread.Sleep(40);
+        if (_gameClicks)
+        {
+            var activated = InputSender.GameClick(x, y, button, clicks, _gameClickMs);
+            if (activated != null) Log?.Invoke(Loc.F("Run_Activated", activated));
+            return;
+        }
+        InputSender.MoveTo(x, y);
+        Thread.Sleep(30);
+        InputSender.Click(button, clicks);
+    }
+
+    private void Drag(DragStep d, CancellationToken ct)
+    {
+        if (_gameClicks)
+        {
+            InputSender.ActivateWindowAt(d.X, d.Y);
+            InputSender.MoveLikeMouse(d.X, d.Y);
+            Thread.Sleep(_gameClickMs);
+        }
+        else
+        {
+            InputSender.MoveTo(d.X, d.Y);
+            Thread.Sleep(40);
+        }
         InputSender.ButtonDown(d.Button);
         try
         {
@@ -160,10 +183,13 @@ public sealed class MacroRunner
             {
                 ct.ThrowIfCancellationRequested();
                 double t = (double)i / steps;
-                InputSender.MoveTo((int)Math.Round(d.X + (d.X2 - d.X) * t), (int)Math.Round(d.Y + (d.Y2 - d.Y) * t));
+                int px = (int)Math.Round(d.X + (d.X2 - d.X) * t), py = (int)Math.Round(d.Y + (d.Y2 - d.Y) * t);
+                if (_gameClicks) InputSender.MoveTowards(px, py);
+                else InputSender.MoveTo(px, py);
                 Thread.Sleep(pause);
             }
-            Thread.Sleep(40);
+            if (_gameClicks) InputSender.MoveExact(d.X2, d.Y2);
+            Thread.Sleep(_gameClicks ? _gameClickMs : 40);
         }
         finally
         {

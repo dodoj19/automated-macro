@@ -35,6 +35,18 @@ Gotov program je u **Releases** (desno na GitHub stranici repozitorija): preuzmi
 - **F10** zaustavlja izvođenje u bilo kojem trenutku, i dok je prozor minimiziran. Mala obavijest o statusu na vrhu ekrana propušta klikove.
 - **Izvedi samo ovo** izvodi samo odabrani korak ili grupu, jednom.
 
+## Klikovi u igrama (Roblox)
+
+Obični klik premjesti kursor „teleportom” (`SetCursorPos`) i drži tipku oko 20 ms. Obični programi to registriraju. Igre koje čitaju raw input (npr. Roblox) pritom ne vide da se miš pomaknuo, pa klik ode na mjesto gdje igra misli da je miš, a pritisak je kraći od jedne sličice igre.
+
+Za takve igre uključi **Postavke petlje → Klik za igre**. Tada program za svaki klik:
+
+1. aktivira prozor igre ako nije u prvom planu (inače prvi klik samo prebaci fokus);
+2. dovede miš kao pravi korisnik, kroz `SendInput` s nekoliko relativnih koraka, pa igra vidi pomak;
+3. pričeka na gumbu i drži klik zadano vrijeme (zadano 80 ms). Na slabijem računalu ili s više klijenata povećaj na 120–200 ms.
+
+Postavka se sprema uz proceduru, pa obične procedure ostaju brze.
+
 ## Jezik i podaci o programu
 
 - **Postavke → Jezik:** hrvatski, engleski ili njemački. Promjena vrijedi odmah i pamti se za sljedeće pokretanje. Pri prvom pokretanju jezik se bira prema jeziku Windowsa.

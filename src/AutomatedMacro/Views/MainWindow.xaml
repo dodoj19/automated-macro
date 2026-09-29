@@ -75,7 +75,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="236"/>
+            <RowDefinition Height="282"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
@@ -815,7 +815,7 @@
         <Border Grid.Row="2" Background="{StaticResource PanelBgBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="370"/>
+                    <ColumnDefinition Width="420"/>
                     <ColumnDefinition Width="1"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="1"/>
@@ -843,10 +843,17 @@
                         <TextBlock DockPanel.Dock="Right" Style="{StaticResource Unit}" Text="ms"/>
                         <TextBox Text="{Binding Settings.CycleDelayMs}"/>
                     </DockPanel>
-                    <DockPanel Style="{StaticResource FormRow}" Margin="0">
+                    <DockPanel Style="{StaticResource FormRow}" Margin="0,0,0,8">
                         <TextBlock Style="{StaticResource FormLabelW}" Text="{local:Tr StartDelay}"/>
                         <TextBlock DockPanel.Dock="Right" Style="{StaticResource Unit}" Text="s"/>
                         <TextBox Text="{Binding Settings.StartDelaySec}"/>
+                    </DockPanel>
+                    <DockPanel Style="{StaticResource FormRow}" Margin="0" ToolTip="{local:Tr Tip_GameClicks}">
+                        <TextBlock Style="{StaticResource FormLabelW}" Text="{local:Tr GameClicks}"/>
+                        <TextBlock DockPanel.Dock="Right" Style="{StaticResource Unit}" Text="ms"/>
+                        <TextBox DockPanel.Dock="Right" Width="64" Margin="8,0,0,0" Text="{Binding Settings.GameClickMs}"
+                                 IsEnabled="{Binding Settings.GameClicks}"/>
+                        <CheckBox IsChecked="{Binding Settings.GameClicks}" Content="{local:Tr GameClicksOn}"/>
                     </DockPanel>
                 </StackPanel>
 

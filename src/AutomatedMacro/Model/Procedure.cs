@@ -24,6 +24,15 @@ public sealed class RunSettings : ObservableObject
     /// <summary>Broj ciklusa za izvodjenje; 0 = beskonacno.</summary>
     [JsonIgnore] public int EffectiveCycles => !Loop ? 1 : Infinite ? 0 : LoopCount;
 
+    private bool _gameClicks;
+    private int _gameClickMs = 80;
+
+    /// <summary>Klikovi za igre (Roblox i sl.): aktivacija prozora, pravi pomak misa, dulji pritisak.</summary>
+    public bool GameClicks { get => _gameClicks; set { if (Set(ref _gameClicks, value)) ChangeTracker.Notify(); } }
+
+    /// <summary>Koliko dugo mis stoji na gumbu prije klika i koliko se tipka drzi (ms).</summary>
+    public int GameClickMs { get => _gameClickMs; set { if (Set(ref _gameClickMs, Math.Clamp(value, 20, 2000))) ChangeTracker.Notify(); } }
+
     /// <summary>Pauza izmedju dva ciklusa.</summary>
     public int CycleDelayMs { get => _cycleDelayMs; set { if (Set(ref _cycleDelayMs, Math.Clamp(value, 0, 86_400_000))) ChangeTracker.Notify(); } }
 

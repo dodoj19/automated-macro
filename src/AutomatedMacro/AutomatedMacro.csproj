@@ -11,7 +11,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
     <Product>Automated Macro</Product>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
     <Authors>Dorijan J.</Authors>
     <Company>Dorijan J.</Company>
     <Copyright>© 2026 Dorijan J.</Copyright>

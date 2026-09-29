@@ -35,15 +35,88 @@ internal static class InputSender
         _ => MOUSEEVENTF_LEFTUP,
     }));
 
-    public static void Click(MouseButtonKind b, int count)
+    public static void Click(MouseButtonKind b, int count, int holdMs = 20, int gapMs = 60)
     {
         for (int i = 0; i < count; i++)
         {
             ButtonDown(b);
-            Thread.Sleep(20);
+            Thread.Sleep(holdMs);
             ButtonUp(b);
-            if (i < count - 1) Thread.Sleep(60);
+            if (i < count - 1) Thread.Sleep(gapMs);
         }
+    }
+
+    // ------------------------------------------------------------ nacin za igre
+    //
+    // SetCursorPos premjesta kursor, ali igre koje citaju raw input (WM_INPUT), npr. Roblox,
+    // tada ne vide nikakav pomak: za njih mis ostaje na staroj poziciji pa klik "promasi" gumb.
+    // Zato se ovdje mis pomice kroz SendInput (apsolutno + nekoliko relativnih koraka),
+    // prije pritiska se ceka nekoliko slicica, a tipka se drzi dulje od jedne slicice.
+
+    private const int FrameMs = 16;
+
+    /// <summary>Premjesti mis kao pravi korisnik: dolazak s malog odmaka, vidljivo i u raw inputu.</summary>
+    public static void MoveLikeMouse(int x, int y)
+    {
+        const int offset = 6, steps = 3;
+        MoveAbsolute(x + offset, y + offset);
+        Thread.Sleep(FrameMs);
+        for (int i = 0; i < steps; i++)
+        {
+            Send(MouseInput(MOUSEEVENTF_MOVE, -offset / steps, -offset / steps));
+            Thread.Sleep(FrameMs);
+        }
+        // Relativni koraci ovise o brzini/ubrzanju pokazivaca, pa na kraju tocno poravnaj.
+        MoveExact(x, y);
+    }
+
+    /// <summary>Relativni pomak prema tocki (raw input vidi pravi pomak).</summary>
+    public static void MoveTowards(int x, int y)
+    {
+        GetCursorPos(out var p);
+        if (p.X != x || p.Y != y) Send(MouseInput(MOUSEEVENTF_MOVE, x - p.X, y - p.Y));
+    }
+
+    /// <summary>Apsolutni pomak kroz SendInput tocno na tocku.</summary>
+    public static void MoveExact(int x, int y)
+    {
+        MoveAbsolute(x, y);
+        GetCursorPos(out var p);
+        if (p.X != x || p.Y != y) SetCursorPos(x, y);
+    }
+
+    private static void MoveAbsolute(int x, int y)
+    {
+        int vx = GetSystemMetrics(SM_XVIRTUALSCREEN), vy = GetSystemMetrics(SM_YVIRTUALSCREEN);
+        int vw = Math.Max(2, GetSystemMetrics(SM_CXVIRTUALSCREEN)), vh = Math.Max(2, GetSystemMetrics(SM_CYVIRTUALSCREEN));
+        int nx = (int)Math.Round((x - vx) * 65535.0 / (vw - 1));
+        int ny = (int)Math.Round((y - vy) * 65535.0 / (vh - 1));
+        Send(MouseInput(MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_VIRTUALDESK, nx, ny));
+    }
+
+    /// <summary>
+    /// Ako prozor ispod tocke nije aktivan, aktivira ga (klik na neaktivan prozor igre
+    /// cesto samo prebaci fokus). Vraca naslov aktiviranog prozora ili null.
+    /// </summary>
+    public static string? ActivateWindowAt(int x, int y)
+    {
+        var root = GetAncestor(WindowFromPoint(new POINT { X = x, Y = y }), GA_ROOT);
+        if (root == IntPtr.Zero || root == GetForegroundWindow()) return null;
+        SetForegroundWindow(root);
+        Thread.Sleep(150);
+        var sb = new System.Text.StringBuilder(256);
+        GetWindowText(root, sb, sb.Capacity);
+        return sb.ToString();
+    }
+
+    /// <summary>Klik za igre: aktiviraj prozor, dovedi mis, pricekaj, drzi tipku.</summary>
+    public static string? GameClick(int x, int y, MouseButtonKind b, int count, int holdMs)
+    {
+        var activated = ActivateWindowAt(x, y);
+        MoveLikeMouse(x, y);
+        Thread.Sleep(holdMs);                       // "hover": igra vidi mis na gumbu
+        Click(b, count, holdMs, Math.Max(60, holdMs));
+        return activated;
     }
 
     public static void KeyDown(ushort vk) => Send(KeyInput(vk, false));
@@ -97,10 +170,10 @@ internal static class InputSender
         }
     }
 
-    private static INPUT MouseInput(uint flags) => new()
+    private static INPUT MouseInput(uint flags, int dx = 0, int dy = 0) => new()
     {
         type = INPUT_MOUSE,
-        U = new InputUnion { mi = new MOUSEINPUT { dwFlags = flags, dwExtraInfo = Signature } },
+        U = new InputUnion { mi = new MOUSEINPUT { dx = dx, dy = dy, dwFlags = flags, dwExtraInfo = Signature } },
     };
 
     private static INPUT KeyInput(ushort vk, bool up)
